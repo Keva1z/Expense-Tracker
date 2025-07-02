@@ -4,7 +4,7 @@ class Base():
     _total_id = 0
 
     def __init__(self, *args, **kwargs):
-        self._total_id += 1
+        Base._total_id += 1
 
         self.id = self._total_id
 
