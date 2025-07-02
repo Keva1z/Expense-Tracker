@@ -7,12 +7,13 @@ class TestStorage(unittest.TestCase):
         database = JSONDatabase('test_data.json')
 
         database._objects = [Expense(100, 'TEST')]
-        objects_before = database._objects
+        objects_before = [object.to_dict() for object in database._objects]
         
         database.save()
 
         new_database = JSONDatabase('test_data.json')
-        objects_new = new_database._objects
+        objects_new = [object.to_dict() for object in new_database._objects]
         
         os.remove('storage/test_data.json')
-        self.assertAlmostEqual(objects_before, objects_new)
+
+        self.assertListEqual(objects_before, objects_new)

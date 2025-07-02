@@ -1,32 +1,37 @@
 from datetime import datetime
 
-class Expense:
+class Base():
     _total_id = 0
 
-    def __init__(self, amount, description, **kwargs):
+    def __init__(self, *args, **kwargs):
         self._total_id += 1
+
         self.id = self._total_id
-        self.amount = amount
-        self.description = description
-        self.date = datetime.strptime(datetime.now().strftime("%d.%m.%Y"), "%d.%m.%Y")
 
         for key, value in kwargs.items():
-            if key == 'date':
-                self.date = datetime.strptime(value, "%d.%m.%Y")
+            if hasattr(self, key):
+                setattr(self, key, value)
 
-    def __repr__(self):
-        return f"Expense(id={self.id}, amount={self.amount}, description='{self.description}', date='{self.date}')"
-
-    def to_dict(self) -> dict[str, str|int]:
-        return {
-            "id": self.id,
-            "amount": self.amount,
-            "description": self.description,
-            "date": self.date.strftime("%d.%m.%Y")
-        }
+    def to_dict(self) -> dict:
+        data: dict = {}
+        for key, value in self.__dict__.items():
+            if not key.startswith("_"):
+                data[key] = value
+        return data
     
     @classmethod
-    def from_dict(cls, data: dict[str, str|int]) -> 'Expense':
-        return cls(amount=data.get('amount'),
-                   description=data.get('description'),
-                   date=data.get("date"))
+    def from_dict(cls, data: dict) -> 'Base':
+        return cls(**data)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(id={self.id}, ' + \
+               f"{', '.join(f'{k}={f'"{v}"' if isinstance(v, str) else v}' for k, v in self.__dict__.items() if k != 'id' and not k.startswith('_'))})"
+
+class Expense(Base):
+
+    def __init__(self, amount: int = 0, description: str = '', *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.amount = amount
+        self.description = description
+        self.date = datetime.now().strftime("%d.%m.%Y")
+        
