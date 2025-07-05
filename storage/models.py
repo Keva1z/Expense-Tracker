@@ -34,4 +34,12 @@ class Expense(Base):
         self.amount = amount
         self.description = description
         self.date = datetime.now().strftime("%d.%m.%Y")
+
+    def __match(self, arg, length: int) -> str:
+        arg = str(arg)
+        if len(arg) > length: return arg[:length]
+        return arg + ' '*(length-len(arg))
+
+    def __repr__(self):
+        return f'{self.__match(self.id, 3)} {self.__match(self.date, 11)} {self.__match(self.description, 11)}    ${self.amount}'
         
